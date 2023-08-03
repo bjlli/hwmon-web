@@ -1,12 +1,3 @@
-    // Function to generate random values for the chart data
-    function generateRandomData() {
-        const data = [];
-        for (let i = 0; i < 7; i++) { 
-            data.push(Math.floor(Math.random() * 500)); 
-        }
-        return data;
-    }
-
     const currentChartCanvas = document.getElementById("currentChart");
     const currentChartCtx = currentChartCanvas.getContext("2d");
 
@@ -47,10 +38,10 @@
                     },
                 },
                 y: {
-                    beginAtZero: true,
+                    beginAtZero: false,
                     title: {
                         display: true,
-                        text: "Current [mA",
+                        text: "Current [mA]",
                         color: "black",
                     },
                     ticks: {
@@ -65,30 +56,35 @@
     });
 
     // Function to fetch the latest data 
-    function fetchLatestData() {
-        const newData = generateRandomData(); 
-        return newData;
+    async function fetchLatestData() {
+        try {
+            const response = await fetch('/read_hwmon_data');
+            const data = await response.json();
+            const value = parseFloat(data);
+            console.log('Converted Value:', value);
+            return value;
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            return 0; 
+        }
     }
 
-    // Function to update the current chart with new data
     function updatecurrentChart() {
         const newData = fetchLatestData();
-
-        // Remove the oldest data point if there are more than 30 data points
-        if (currentChart.data.labels.length >= 30) {
-            currentChart.data.labels.shift();
-            currentChart.data.datasets[0].data.shift();
-        }
-
-        // Add the new data point to the current chart
-        currentChart.data.labels.push(new Date().toLocaleTimeString()); 
-        currentChart.data.datasets[0].data.push(newData); 
-
-        // Update the current chart
-        currentChart.update();
+    
+        newData.then((value) => {
+            if (currentChart.data.labels.length >= 30) {
+                currentChart.data.labels.shift();
+                currentChart.data.datasets[0].data.shift();
+            }
+    
+            currentChart.data.labels.push(new Date().toLocaleTimeString());
+            currentChart.data.datasets[0].data.push(value);
+    
+            currentChart.update();
+        });
     }
 
-    // Initial current chart update
     updatecurrentChart();
 
     // Update the current chart every 20 seconds
