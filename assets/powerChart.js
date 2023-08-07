@@ -38,7 +38,7 @@
                     },
                 },
                 y: {
-                    beginAtZero: false,
+                    beginAtZero: true,
                     title: {
                         display: true,
                         text: "Current [mA]",
