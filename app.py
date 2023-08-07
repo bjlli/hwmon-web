@@ -11,7 +11,7 @@ def index():
 @app.route('/read_hwmon_data')
 def read_hwmon_data():
     try:
-        with open('/sys/class/hwmon/hwmon1/in0_input', 'r') as file:
+        with open('/sys/class/hwmon/hwmon1/curr1_input', 'r') as file:
             content = file.read().strip()
 
         return jsonify(content)
